@@ -2,6 +2,7 @@
 
 void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
 {
+    //declaring node to be pushed
     struct Node new;
     new.data = memmalloc(memsys, width);
     new.next = *node_ptr;
@@ -11,42 +12,55 @@ void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
     
 }
 
+/********************************************************************************/
+
 void insert( struct memsys * memsys, int * node_ptr, void * src, size_t width )
 {
-    void* dest;  
-    int addr, addr2;
-    //get the first node, the one before the insert 
-    getval(memsys, dest, sizeof(struct Node), *node_ptr);
-
-    addr = memmalloc(memsys, width);
-    setval(memsys, src ,width , addr);
-
+    //the node after which we insert
+    void* node1;
+    //the node to be inserted
     struct Node new;
-    new.data = addr;
-    new.next = dest->next;
-    //saving the valude of the inserted node
-    addr2 = memmalloc(memsys, sizeof(struct Node));
-    setval(memsys, &new, sizeof(struct Node), addr2);
-    //saving value of the first node
-    dest->next = addr2;
-    setval(memsys, dest, sizeof(struct Node), *node_ptr);
+
+    //get the first node, the one before the insert 
+    getval(memsys, node1, sizeof(struct Node), *node_ptr);
+    
+    // setting the values in the new node and savind it malloc 
+    new.data = memmalloc(memsys, width);
+    new.next = node1->next;
+    setval(memsys, src ,width , new.data);
+
+    //saving the value of the inserted node to memsys and saving the address of the 
+    //inserted node in the next of node
+    node1->next = memmalloc(memsys, sizeof(struct Node));
+    setval(memsys, &new, sizeof(struct Node), node1->next);
+    
+    //saving the modified value of the first node back to memsys
+    setval(memsys, node1, sizeof(struct Node), *node_ptr);
 
 }
+
+/********************************************************************************/
+
 
 void delete( struct memsys * memsys, int * node_ptr )
 {
-    void* nodea, nodeb;// node a is the node before, node b is the node to delete
-    int addrb;
-    getval(memsys, nodea, sizeof(struct Node), *node_ptr);
-    addrb = nodea->next;
-    getval(memsys, nodeb, sizeof(struct Node), addrb);
-    nodea->next = nodeb->next;
-    setval(memsys, nodea, sizeof(struct Node), *node_ptr);
-    /*doubt: do we have to free every part of the structure node or is the 
-    following statement good?*/
-    memfree(memsys, addrb);
+    //function to delete node 2
+    // node 1 is the node before, node 2 is the node to delete
+    void* node1, node2;
+    //address of the node to delete
+    int addr;
+    getval(memsys, node1, sizeof(struct Node), *node_ptr);
+    addr = nodea->next;
+    getval(memsys, node2, sizeof(struct Node), addr);
+    node1->next = node2->next;
+    setval(memsys, node1, sizeof(struct Node), *node_ptr);
+    //freeing the data associated with the node and then freeing the node
+    memefree(memsys, node->data);
+    memfree(memsys, addr);
     
 }
+
+/********************************************************************************/
 
 void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int width )
 {
@@ -58,6 +72,9 @@ void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int
         getval(memsys, dest, width, node_ptr->data);
     }
 }
+
+/********************************************************************************/
+
 
 void pop( struct memsys * memsys, int * node_ptr )
 {
@@ -75,6 +92,9 @@ void pop( struct memsys * memsys, int * node_ptr )
     }
 }
 
+/********************************************************************************/
+
+
 int next( struct memsys * memsys, int * node_ptr )
 {
     void* ptr;
@@ -87,6 +107,10 @@ int next( struct memsys * memsys, int * node_ptr )
         return node_ptr->next ;
     }
 }
+
+/********************************************************************************/
+Indore4056273
+Indore4056273
 
 int isNull( struct memsys * memsys, int * node_ptr )
 {
