@@ -78,8 +78,9 @@ void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int
 
 void pop( struct memsys * memsys, int * node_ptr )
 {
-    int addr;
-    void* node1;//the head node
+    int addr;//to store the address of the node to delete
+    void* node1;//the head node i.e, the node to delete
+
     if(node_ptr == NULL){
         fprinf(stderr, "ERROR: List is empty");
         exit(0);
@@ -88,6 +89,8 @@ void pop( struct memsys * memsys, int * node_ptr )
         addr = *node_ptr;
         getval(memsys, node1, sizeof(struct Node), addr);
         *node_ptr = node1->next; 
+
+        //freeing the data associated with the node and then freeing the node
         memefree(memsys,node1->data);
         memfree(memsys, addr);
     }
@@ -104,14 +107,11 @@ int next( struct memsys * memsys, int * node_ptr )
         exit(0);
     }
     else{
-        
         return node_ptr->next ;
     }
 }
 
 /********************************************************************************/
-Indore4056273
-Indore4056273
 
 int isNull( struct memsys * memsys, int * node_ptr )
 {
@@ -120,6 +120,9 @@ int isNull( struct memsys * memsys, int * node_ptr )
     }
     return 0; 
 }
+/********************************************************************************/
+//List functions
+/********************************************************************************/
 
 //struct List *newList( struct memsys *memsys, unsigned int width )
 //{
