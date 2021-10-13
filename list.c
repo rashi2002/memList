@@ -79,16 +79,17 @@ void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int
 void pop( struct memsys * memsys, int * node_ptr )
 {
     int addr;
-    void* nodeh;//the head node
+    void* node1;//the head node
     if(node_ptr == NULL){
         fprinf(stderr, "ERROR: List is empty");
         exit(0);
     }
     else{
         addr = *node_ptr;
-        getval(memsys, nodeh, sizeof(struct Node), addr);
-        *node_ptr = nodeh->next; 
-        memfree(addr);
+        getval(memsys, node1, sizeof(struct Node), addr);
+        *node_ptr = node1->next; 
+        memefree(memsys,node1->data);
+        memfree(memsys, addr);
     }
 }
 
