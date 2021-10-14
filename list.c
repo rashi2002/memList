@@ -69,7 +69,7 @@ void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int
     }
     else{
         getval(memsys, node1, sizeof(struct Node), *node_ptr);
-        getval(memsys, dest, width, node1->next );
+        getval(memsys, dest, width, node1->data );
     }
 }
 
@@ -125,48 +125,60 @@ int isNull( struct memsys * memsys, int * node_ptr )
 //List functions
 /********************************************************************************/
 
-//struct List *newList( struct memsys *memsys, unsigned int width )
-//{
+struct List *newList( struct memsys *memsys, unsigned int width )
+{
+    struct List *new = (struct List*)malloc(sizeof (struct List));
+    if (new==NULL){
+        fprintf(stderr, "ERROR: malloc failed, exiting\n");
+        exit(0);
+    }
+    new->width = width;
+    new->head = MEMNULL;
+    return new;
+}
 
-//}
+/********************************************************************************/
 
-
-/*
 void freeList( struct memsys *memsys, struct List *list )
 {
-
+    int* temp=NULL;
+    struct Node* node=NULL;
+    //struct List* head;
+    if (list->head == MEMNULL){
+        fprintf(stderr, "The list is already empty, exiting the program\n");
+        exit(0);
+    }
+    while (list->head!=MEMNULL){
+        temp = &list->head;
+        getval(memsys, node, sizeof(struct Node), list->head);
+        pop(memsys, temp);
+        list->head = node->next;
+    }
+    free(list);
 }
+
+
 int isEmpty( struct memsys *memsys, struct List *list )
 {
-
-}
-void readItem( struct memsys *memsys, struct List *list,unsigned int index, void* dest )
-{
-
-}
-void appendItem( struct memsys *memsys, struct List *list,void *src )
-{
-
-}
-void prependItem( struct memsys *memsys, struct List *list,void *src )
-{
-
-}
-void deleteItem( struct memsys *memsys, struct List *list,unsigned int index )
-{
-
+    if (list->head == MEMNULL){
+        return 1;
+    }
+    return 0;
 }
 
-//the last 20% 
-int findItem( struct memsys *memsys, struct List *list,int(*compar)(const void*, const void*), void * target )
-{
-
+void readItem( struct memsys *memsys, struct List *list, unsigned int index, void *dest ){
+  int head = list->head;
+    if (head == MEMNULL)
+    {
+        fprintf(stderr, "ERROR: the list is empty\n");
+        exit(0);
+    }
+    else
+    {
+        for (int i = 1; i <= index; i++)
+        {
+            i = next(memsys, &head);
+        }
+        readHead(memsys, &head, dest, list->width);
+    }
 }
-
-
-
-*/
-
-
-
-
