@@ -157,13 +157,14 @@ void freeList( struct memsys *memsys, struct List *list )
     free(list);
 }
 
+/********************************************************************************/
 
 int isEmpty( struct memsys *memsys, struct List *list )
 {
     if (list->head == MEMNULL){
         return 1;
     }
-    return 0;
+	return 0;
 }
 
 void readItem( struct memsys *memsys, struct List *list, unsigned int index, void *dest ){
@@ -185,28 +186,77 @@ void readItem( struct memsys *memsys, struct List *list, unsigned int index, voi
 
 void appendItem( struct memsys *memsys, struct List *list,void *src )
 {
-    struct Node* lastNode=NULL, new;
     int nextaddr = list->head;
     int ptr;
-    while (isNULL(memsys, &nextaddr)){
+	if(isEmpty(memsys, list)){
+		push(memsys, &(list->head) ,src, list->width );
+	}
+    while (isNull(memsys, &nextaddr)){
         ptr= nextaddr;
         nextaddr = next(memsys, &ptr);
     }
-	insert(memsys, ptr,src, sizeof(struct Node));
+	insert(memsys, ptr,src, list->width);
 
 }
 
 void insertItem( struct memsys *memsys, struct List *list, unsigned int index, void *src )
 {
 	int ptr = list->head;
-	for(int i=0; i<index; i++){
-		ptr = next(memsys, &ptr);
+	if(index==0){
+		push(memsys, &(list->head), src, list->width);
 	}
-	insert(memsys, ptr,src, sizeof(struct Node));
+	else{
+		for(int i = 1; i<index; i++){
+			ptr = next(memsys, &ptr);
+		}
+	insert(memsys, ptr,src, list->width);
+	}
 }
 
 
 void prependItem( struct memsys *memsys, struct List *list,void *src )
 {
+	insertItem( memsys,list, 0,src );
+}
+
+void deleteItem( struct memsys *memsys, struct List *list,unsigned int index )
+{
+	int ptr= list->head; 
+	if(isEmpty(memsys, list)){
+		fprintf(stderr, "ERROR: the list is empty\n");
+		exit(0);
+	}
+	else if(index==0){
+		pop(memsys, &(list->head));
+	}
+	else{
+		for(int i = 1 ; i < index; i++){
+			ptr = next(memsys, &ptr);
+		}
+		delete(memsys, &ptr);
+	}
+}
+
+int findItem( struct memsys *memsys, struct List *list,int (*compar)(const void *, const void *), void *target )
+{
+	int ptr = list->head;
+	int counter = 0;
+	void* dest = malloc(list->width);
+	if(isEmpty(memsys, list)){
+		fprintf(stderr, "ERROR: the list is empty\n");
+		exit(0);
+	}
+	else{
+		while (!isNull(memsys,&ptr)){
+			readHead(memsys, &ptr, dest, list->width);
+			if((*compar)(dest, target)==0){
+				free(ptr);
+				return counter;
+			}
+			counter++;
+		}
+		free(ptr);
+		return -1;
+	}
 
 }

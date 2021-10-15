@@ -1,6 +1,8 @@
 CC = clang 
 CFLAGS  = -Wall -std=c99 -pedantic
 
+
+
 list.o: memsys.o memsys.h list.h
 	$(CC) $(CFLAGS) -c list.c
 
