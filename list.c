@@ -4,12 +4,13 @@ void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
 {
     //declaring node to be pushed
     struct Node new;
+	int a; 
     new.data = memmalloc(memsys, width);
     new.next = *node_ptr;
     setval(memsys, src, width,new.data);
-    *node_ptr  = memmalloc(memsys, sizeof(struct Node));
-    setval(memsys, &new, sizeof(struct Node), *node_ptr );
-    
+    a = memmalloc(memsys, sizeof(struct Node));
+    setval(memsys, &new, sizeof(struct Node), a );
+	*node_ptr = a;
 }
 
 /********************************************************************************/
@@ -17,23 +18,24 @@ void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
 void insert( struct memsys * memsys, int * node_ptr, void * src, size_t width )
 {
     //the node to be inserted
-    struct Node *new=NULL, *node1=NULL;
+    struct Node new, node1;
+	int temp;
     
     //get the first node, the one before the insert 
-    getval(memsys, node1, sizeof(struct Node), *node_ptr);
+    getval(memsys, &node1, sizeof(struct Node), *node_ptr);
     
     // setting the values in the new node and savind it malloc 
-    new->data = memmalloc(memsys, width);
-    new->next = node1->next;
-    setval(memsys, src ,width , new->data);
+    new.data = memmalloc(memsys, width);
+    new.next = node1.next;
+    setval(memsys, src ,width , new.data);
 
     //saving the value of the inserted node to memsys and saving the address of the 
     //inserted node in the next of node
-    node1->next = memmalloc(memsys, sizeof(struct Node));
-    setval(memsys, new, sizeof(struct Node), node1->next);
-    
+    temp= memmalloc(memsys, sizeof(struct Node));
+    setval(memsys, &new, sizeof(struct Node), temp);
+    node1.next = temp;
     //saving the modified value of the first node back to memsys
-    setval(memsys, node1, sizeof(struct Node), *node_ptr);
+    setval(memsys, &node1, sizeof(struct Node), *node_ptr);
 
 }
 
@@ -62,14 +64,14 @@ void delete( struct memsys * memsys, int * node_ptr )
 
 void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int width )
 {
-    struct Node *node1=NULL;
-    if(node_ptr == MEMNULL){
+    struct Node node1;
+    if(*node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
     else{
-        getval(memsys, node1, sizeof(struct Node), *node_ptr);
-        getval(memsys, dest, width, node1->data );
+        getval(memsys, &node1, sizeof(struct Node), *node_ptr);
+        getval(memsys, dest, width, node1.data );
     }
 }
 
@@ -81,7 +83,7 @@ void pop( struct memsys * memsys, int * node_ptr )
     int addr;//to store the address of the node to delete
     struct Node* node1=NULL;//the head node i.e, the node to delete
 
-    if(node_ptr == MEMNULL){
+    if(*node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
@@ -101,8 +103,8 @@ void pop( struct memsys * memsys, int * node_ptr )
 
 int next( struct memsys * memsys, int * node_ptr )
 {
-    struct Node *node1= MEMNULL;
-    if(node_ptr == NULL){
+    struct Node *node1= NULL;
+    if(*node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
@@ -127,7 +129,7 @@ int isNull( struct memsys * memsys, int * node_ptr )
 
 struct List *newList( struct memsys *memsys, unsigned int width )
 {
-    struct List *new = (struct List*)malloc(sizeof (struct List));
+    struct List *new = malloc(sizeof (struct List));
     if (new==NULL){
         fprintf(stderr, "ERROR: malloc failed, exiting\n");
         exit(0);
@@ -169,14 +171,14 @@ int isEmpty( struct memsys *memsys, struct List *list )
 
 void readItem( struct memsys *memsys, struct List *list, unsigned int index, void *dest ){
     int head = list->head;
-    if (head == MEMNULL)
+    if (isEmpty(memsys, list))
     {
         fprintf(stderr, "ERROR: the list is empty\n");
         exit(0);
     }
     else
     {
-        for (int i = 0; i <index; i++)
+        for (int i = 1; i <=index; i++)
         {
             head = next(memsys, &head);
         }
@@ -190,12 +192,13 @@ void appendItem( struct memsys *memsys, struct List *list,void *src )
     int ptr;
 	if(isEmpty(memsys, list)){
 		push(memsys, &(list->head) ,src, list->width );
+		return;
 	}
-    while (isNull(memsys, &nextaddr)){
+    while (!isNull(memsys, &nextaddr)){
         ptr= nextaddr;
-        nextaddr = next(memsys, &ptr);
+        nextaddr = next(memsys, &nextaddr);
     }
-	insert(memsys, ptr,src, list->width);
+	insert(memsys, &ptr,src, list->width);
 
 }
 
@@ -204,12 +207,13 @@ void insertItem( struct memsys *memsys, struct List *list, unsigned int index, v
 	int ptr = list->head;
 	if(index==0){
 		push(memsys, &(list->head), src, list->width);
+		return;
 	}
 	else{
 		for(int i = 1; i<index; i++){
 			ptr = next(memsys, &ptr);
 		}
-	insert(memsys, ptr,src, list->width);
+		insert(memsys, &ptr,src, list->width);
 	}
 }
 
@@ -250,13 +254,12 @@ int findItem( struct memsys *memsys, struct List *list,int (*compar)(const void 
 		while (!isNull(memsys,&ptr)){
 			readHead(memsys, &ptr, dest, list->width);
 			if((*compar)(dest, target)==0){
-				free(ptr);
+				free(dest);
 				return counter;
 			}
 			counter++;
 		}
-		free(ptr);
+		free(dest);
 		return -1;
 	}
-
 }
