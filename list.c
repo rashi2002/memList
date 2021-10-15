@@ -15,8 +15,6 @@ void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
 /********************************************************************************/
 
 void insert( struct memsys * memsys, int * node_ptr, void * src, size_t width )
-
-
 {
     //the node to be inserted
     struct Node *new=NULL, *node1=NULL;
@@ -185,8 +183,9 @@ void readItem( struct memsys *memsys, struct List *list, unsigned int index, voi
     }
 }
 
-void appendItem( struct memsys *memsys, struct List *list,void *src ){
-    struct Node* lastNode, new;
+void appendItem( struct memsys *memsys, struct List *list,void *src )
+{
+    struct Node* lastNode=NULL, new;
     int nextaddr = list->head;
     int ptr;
     while (isNULL(memsys, &nextaddr)){
@@ -197,11 +196,17 @@ void appendItem( struct memsys *memsys, struct List *list,void *src ){
 
 }
 
-void insertItem( struct memsys *memsys, struct List *list, unsigned int index, void *src ){
-	
+void insertItem( struct memsys *memsys, struct List *list, unsigned int index, void *src )
+{
+	int ptr = list->head;
+	for(int i=0; i<index; i++){
+		ptr = next(memsys, &ptr);
+	}
+	insert(memsys, ptr,src, sizeof(struct Node));
 }
 
 
-void prependItem( struct memsys *memsys, struct List *list,void *src ){
+void prependItem( struct memsys *memsys, struct List *list,void *src )
+{
 
 }
