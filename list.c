@@ -15,6 +15,8 @@ void push( struct memsys * memsys, int *  node_ptr,void*src, size_t width )
 /********************************************************************************/
 
 void insert( struct memsys * memsys, int * node_ptr, void * src, size_t width )
+
+
 {
     //the node to be inserted
     struct Node *new=NULL, *node1=NULL;
@@ -63,7 +65,7 @@ void delete( struct memsys * memsys, int * node_ptr )
 void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int width )
 {
     struct Node *node1=NULL;
-    if(node_ptr == NULL){
+    if(node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
@@ -81,7 +83,7 @@ void pop( struct memsys * memsys, int * node_ptr )
     int addr;//to store the address of the node to delete
     struct Node* node1=NULL;//the head node i.e, the node to delete
 
-    if(node_ptr == NULL){
+    if(node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
@@ -101,7 +103,7 @@ void pop( struct memsys * memsys, int * node_ptr )
 
 int next( struct memsys * memsys, int * node_ptr )
 {
-    struct Node *node1= NULL;
+    struct Node *node1= MEMNULL;
     if(node_ptr == NULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
@@ -116,7 +118,7 @@ int next( struct memsys * memsys, int * node_ptr )
 
 int isNull( struct memsys * memsys, int * node_ptr )
 {
-    if(node_ptr == NULL){
+    if(*node_ptr == MEMNULL){
         return 1;
     }
     return 0; 
@@ -167,7 +169,7 @@ int isEmpty( struct memsys *memsys, struct List *list )
 }
 
 void readItem( struct memsys *memsys, struct List *list, unsigned int index, void *dest ){
-  int head = list->head;
+    int head = list->head;
     if (head == MEMNULL)
     {
         fprintf(stderr, "ERROR: the list is empty\n");
@@ -175,10 +177,24 @@ void readItem( struct memsys *memsys, struct List *list, unsigned int index, voi
     }
     else
     {
-        for (int i = 1; i <= index; i++)
+        for (int i = 0; i <index; i++)
         {
-            i = next(memsys, &head);
+            head = next(memsys, &head);
         }
         readHead(memsys, &head, dest, list->width);
     }
 }
+
+void appendItem( struct memsys *memsys, struct List *list,void *src ){
+    struct Node* lastNode, new;
+    int nextaddr = list->head;
+    int ptr;
+    while (isNULL(memsys, &nextaddr)){
+        ptr= nextaddr;
+        nextaddr = next(memsys, &ptr);
+    }
+	insert(memsys, ptr,src, sizeof(struct Node));
+
+}
+
+
