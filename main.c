@@ -1,87 +1,119 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "list.h"
-#include "memsys.h"
+#include "list.h"	// LIST mode: include list.h
 
-int cmp( const void *p1, const void *p2 )
-{
-  int *i1, *i2;
 
-  i1 = p1;
-  i2 = p2;
+/* This program will conduct a bunch of tests on either an array or a list.
+ */
 
-  return *i1 - *i2;
-}
+#define	CAPACITY	100	// total capacity of the array
+#define NEL		 20	// number of elements of the series to include
+
 
 
 int main( int argc, char **argv )
 {
-  int i,j;
-  int ten = 10, three=3;
+  int i;
+  double number;
+
   struct memsys *memsys;
-  struct List *list;
+  
+  memsys = init( 32760, 512 );
 
-  // struct Node *list;
-  // struct Node **list_ptr;
-  //
 
-  memsys = init( 1024, 128 );
+  struct List *sequence;
 
-  list = newList( memsys, sizeof( int ) );
 
-  printf( "isEmpty = %d\n", isEmpty( memsys, list ) );
-  // should print 1
- 
-  // should print isEmpty=0 and j increasing from 0 to 9 
-  printf( "prependItem\n" );
-  for (i=0;i<10;i++)
+  sequence = newList( memsys, sizeof( double ) );;
+
+
+  printf( "after new\n" );
+  printops( memsys ); // make sure you are using the latest version of memsys
+  printf( "\n\n" );
+
+  // fill data structure with doubles, numbered from 0 to NEL-1
+  for (i=0;i<NEL;i++)
   {
-    printf( "%d: ", i );
-    prependItem( memsys, list, &i );
-    readItem( memsys, list, 0, &j );
-      // should print 0
-    printf( "j = %d\n", j );
-  }
-  printf( "isEmpty = %d\n", isEmpty( memsys, list ) );
-
-  for (i=11;i<21;i++)
-  {
-    printf( "%d: ", i-1 );
-    appendItem( memsys, list, &i );
-    readItem( memsys, list, i-1, &j );
-    printf( "j = %d\n", j );
+    number = i;
+    appendItem( memsys, sequence, &number );
   }
 
-  insertItem( memsys, list, 10, &ten );
-  fprintf( stderr, "1\n" );
-  deleteItem( memsys, list, 3 );
-  fprintf( stderr, "2\n" );
+  printf( "after appendItem x 20\n" );
+  printops( memsys );
+  printf( "\n\n" );
 
-  // should print j decreasing from 9 to 0 and and then increasing from 10 to 20
-  for ( i=0;i<20;i++)
+  printf( "Initial data:\n" );
+  for (i=0;i<NEL;i++)
   {
-    readItem( memsys, list, i, &j );
-    printf( "%d, ", j );
+    readItem( memsys, sequence, i, &number );
+    printf( "%d %f\n", i, number );
   }
-  printf( "\n" );
 
-  print( memsys );
+  printf( "after readItem x 20\n" );
+  printops( memsys );
+  printf( "\n\n" );
 
-  // should be at position 5 in the list
-  printf( "%d is at %d\n", three, findItem( memsys, list, cmp, &three ) );
+  // now insert the value 7.5 at index 8
+  number = 7.5;
+  insertItem( memsys, sequence, 8, &number );
+  printf( "after insertItem =7.5 at index 8\n" );
+  printops( memsys );
+  printf( "\n\n" );
 
-  while (!isEmpty(memsys,list))
+  for (i=0;i<NEL+1;i++)
   {
-    deleteItem( memsys, list, 0 );
+    readItem( memsys, sequence, i, &number );
+    printf( "%d %f\n", i, number );
   }
-  // should print isEmpty = 1
-  printf( "isEmpty = %d\n", isEmpty( memsys, list ) );
 
-  print( memsys );
+  printf( "after readItem x 21\n" );
+  printops( memsys );
+  printf( "\n\n" );
+
+  // now prepend the value -1.0
+  number = -1.0;
+  prependItem( memsys, sequence, &number );
+  printf( "after prependItem\n" );
+  printops( memsys );
+  printf( "\n\n" );
+
+
+  printf( "After prepend:\n" ); 
+  for (i=0;i<NEL+2;i++)
+  {
+    readItem( memsys, sequence, i, &number );
+    printf( "%d %f\n", i, number );
+  }
+
+  printf( "after readItem x 22\n" );
+  printops( memsys );
+  printf( "\n\n" );
+
+  // delete element 16
+  deleteItem( memsys, sequence, 16 );
+  printf( "after deleteItem\n" );
+  printops( memsys );
+  printf( "\n\n" );
+
+  printf( "After delete:\n" );
+  for (i=0;i<NEL+1;i++)
+  {
+    readItem( memsys, sequence, i, &number );
+    printf( "%d %f\n", i, number );
+  }
+
+  printf( "after readItem x 21\n" );
+  printops( memsys );
+  printf( "\n\n" );
+
+
+  freeList( memsys, sequence );
+
+  printf( "after free\n" );
+  printops( memsys );
+  printf( "\n\n" );
 
   shutdown( memsys );
-
-  return 0;
 }
 

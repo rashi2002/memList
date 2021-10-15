@@ -46,16 +46,16 @@ void delete( struct memsys * memsys, int * node_ptr )
 {
     //function to delete node 2
     // node 1 is the node before, node 2 is the node to delete
-    struct Node *node1=NULL, *node2=NULL;
+    struct Node node1, node2;
     //address of the node to delete
     int addr;
-    getval(memsys, node1, sizeof(struct Node), *node_ptr);
-    addr = node1->next;
-    getval(memsys, node2, sizeof(struct Node), addr);
-    node1->next = node2->next;
-    setval(memsys, node1, sizeof(struct Node), *node_ptr);
+    getval(memsys, &node1, sizeof(struct Node), *node_ptr);
+    addr = node1.next;
+    getval(memsys, &node2, sizeof(struct Node), addr);
+    node1.next = node2.next;
+    setval(memsys, &node1, sizeof(struct Node), *node_ptr);
     //freeing the data associated with the node and then freeing the node
-    memfree(memsys, node2->data);
+    memfree(memsys, node2.data);
     memfree(memsys, addr);
     
 }
@@ -81,7 +81,7 @@ void readHead( struct memsys * memsys, int * node_ptr ,void * dest, unsigned int
 void pop( struct memsys * memsys, int * node_ptr )
 {
     int addr;//to store the address of the node to delete
-    struct Node* node1=NULL;//the head node i.e, the node to delete
+    struct Node node1;//the head node i.e, the node to delete
 
     if(*node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
@@ -89,11 +89,11 @@ void pop( struct memsys * memsys, int * node_ptr )
     }
     else{
         addr = *node_ptr;
-        getval(memsys, node1, sizeof(struct Node), addr);
-        *node_ptr = node1->next; 
+        getval(memsys, &node1, sizeof(struct Node), addr);
+        *node_ptr = node1.next; 
 
         //freeing the data associated with the node and then freeing the node
-        memfree(memsys,node1->data);
+        memfree(memsys,node1.data);
         memfree(memsys, addr);
     }
 }
@@ -103,14 +103,14 @@ void pop( struct memsys * memsys, int * node_ptr )
 
 int next( struct memsys * memsys, int * node_ptr )
 {
-    struct Node *node1= NULL;
+    struct Node node1;
     if(*node_ptr == MEMNULL){
         fprintf(stderr, "ERROR: List is empty");
         exit(0);
     }
     else{
-        getval(memsys, node1, sizeof(struct Node), *node_ptr);
-        return node1->next ;
+        getval(memsys, &node1, sizeof(struct Node), *node_ptr);
+        return node1.next ;
     }
 }
 
@@ -144,17 +144,13 @@ struct List *newList( struct memsys *memsys, unsigned int width )
 void freeList( struct memsys *memsys, struct List *list )
 {
     int* temp=NULL;
-    struct Node* node=NULL;
-    //struct List* head;
     if (list->head == MEMNULL){
         fprintf(stderr, "The list is already empty, exiting the program\n");
         exit(0);
     }
     while (list->head!=MEMNULL){
         temp = &list->head;
-        getval(memsys, node, sizeof(struct Node), list->head);
         pop(memsys, temp);
-        list->head = node->next;
     }
     free(list);
 }
@@ -226,11 +222,7 @@ void prependItem( struct memsys *memsys, struct List *list,void *src )
 void deleteItem( struct memsys *memsys, struct List *list,unsigned int index )
 {
 	int ptr= list->head; 
-	if(isEmpty(memsys, list)){
-		fprintf(stderr, "ERROR: the list is empty\n");
-		exit(0);
-	}
-	else if(index==0){
+	if(index==0){
 		pop(memsys, &(list->head));
 	}
 	else{
@@ -257,7 +249,11 @@ int findItem( struct memsys *memsys, struct List *list,int (*compar)(const void 
 				free(dest);
 				return counter;
 			}
-			counter++;
+			else{
+				counter++;
+				ptr = next(memsys, &ptr);
+			}
+			
 		}
 		free(dest);
 		return -1;
