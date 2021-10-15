@@ -30,6 +30,7 @@ void freeList( struct memsys *memsys, struct List *list );
 int isEmpty( struct memsys *memsys, struct List *list );
 void readItem( struct memsys *memsys, struct List *list,unsigned int index, void* dest );
 void appendItem( struct memsys *memsys, struct List *list,void *src );
+void insertItem( struct memsys *memsys, struct List *list, unsigned int index, void *src );
 void prependItem( struct memsys *memsys, struct List *list,void *src );
 void deleteItem( struct memsys *memsys, struct List *list,unsigned int index );
 
