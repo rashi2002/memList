@@ -28,6 +28,5 @@
 28                           correct makefile options: 1
 29                                  code has comments: 1
 30                                   code is indented: 1
-Late penalty:                                        -31
 ========================================================
 Total:                                              0/30
